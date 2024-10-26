@@ -9,15 +9,10 @@ system.clk_domain = SrcClockDomain()
 system.clk_domain.clock = "1GHz"
 system.clk_domain.voltage_domain = VoltageDomain()
 
-system.mem_mode = "timing"
-system.mem_ranges = [AddrRange("512MB")]
-
 system.cpu = RiscvMinorCPU()
 
 system.cpu.icache = L1ICache()
 system.cpu.dcache = L1DCache()
-
-system.membus = SystemXBar()
 
 system.cpu.icache.connectCPU(system.cpu)
 system.cpu.dcache.connectCPU(system.cpu)
@@ -29,11 +24,14 @@ system.cpu.dcache.connectBus(system.l2bus)
 
 system.l2cache = L2Cache()
 system.l2cache.connectCPUSideBus(system.l2bus)
+
 system.membus = SystemXBar()
 system.l2cache.connectMemSideBus(system.membus)
 
 system.cpu.createInterruptController()
 
+system.mem_mode = "timing"
+system.mem_ranges = [AddrRange("512MB")]
 system.mem_ctrl = MemCtrl()
 system.mem_ctrl.dram = DDR3_1600_8x8()
 system.mem_ctrl.dram.range = system.mem_ranges[0]
@@ -51,7 +49,7 @@ binary = os.path.join(
 system.workload = SEWorkload.init_compatible(binary)
 
 process = Process()
-process.cmd = [binary] + sys.argv[2:]
+process.cmd = [binary]
 system.cpu.workload = process
 system.cpu.createThreads()
 
